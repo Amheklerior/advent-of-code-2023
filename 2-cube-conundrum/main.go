@@ -6,14 +6,12 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 )
 
 const PATH string = "./input.txt"
-const MAX_RED int = 12
-const MAX_GREEN int = 13
-const MAX_BLUE int = 14
 
 func getCountsFor(str, color string) []string {
 	digitsRegex := regexp.MustCompile(`\d+`)
@@ -21,14 +19,14 @@ func getCountsFor(str, color string) []string {
 	return digitsRegex.FindAllString(strings.Join(r.FindAllString(str, -1), " "), -1)
 }
 
-func areCountsWithinRange(counts []string, maxCount int) bool {
-	for _, v := range counts {
-		count, _ := strconv.Atoi(v)
-		if count > maxCount {
-			return false
-		}
-	}
-	return true
+func findMax(counts []string) int {
+	sort.Slice(counts, func(i, j int) bool {
+		n1, _ := strconv.Atoi(counts[i])
+		n2, _ := strconv.Atoi(counts[j])
+		return n1 < n2
+	})
+	max, _ := strconv.Atoi(counts[len(counts)-1])
+	return max
 }
 
 func main() {
@@ -44,23 +42,18 @@ func main() {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		// Extract the game id and counts for all colored cubes
-		gameId, _ := strings.CutPrefix(strings.Split(line, ":")[0], "Game ")
-		id, _ := strconv.Atoi(gameId)
+		// Extract the counts for all colored cubes
 		reds := getCountsFor(line, "red")
 		greens := getCountsFor(line, "green")
 		blues := getCountsFor(line, "blue")
 
-		// Invalidate what would be an impossible game
-		// based on the MAX_* constraints
-		isValidGame := areCountsWithinRange(reds, MAX_RED) &&
-			areCountsWithinRange(greens, MAX_GREEN) &&
-			areCountsWithinRange(blues, MAX_BLUE)
+		// Find the highest count for each colored cube
+		maxRed := findMax(reds)
+		maxGreen := findMax(greens)
+		maxBlue := findMax(blues)
 
-		// Sum up valid game ids
-		if isValidGame {
-			sum += id
-		}
+		// Sum up the power of the set of cubes
+		sum += maxRed * maxGreen * maxBlue
 	}
 
 	fmt.Println(sum)
