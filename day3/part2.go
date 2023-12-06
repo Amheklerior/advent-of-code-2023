@@ -1,4 +1,4 @@
-package main
+package day3
 
 import (
 	"bufio"
@@ -10,19 +10,12 @@ import (
 	"strings"
 )
 
-const PATH string = "./input.txt"
-
-type Part struct {
-	number string
-	pos    [2]int
+func TODO2(str string) int {
+	return len(str)
 }
 
-type Gear struct {
-	x, y int
-}
-
-func main() {
-	f, e := os.Open(PATH)
+func SolutionPart2(path string) int {
+	f, e := os.Open(path)
 	if e != nil {
 		log.Fatalf("Could not open the file: %s", e)
 	}
@@ -91,6 +84,18 @@ func main() {
 			sum += adjacents[0] * adjacents[1]
 		}
 	}
+	return sum
+}
 
-	fmt.Println(sum)
+func TestP2() {
+	fmt.Println("Day 3 / Part 2: Test")
+	expected := 467835
+	result := SolutionPart2("./day3/data/p2-input.test.txt")
+
+	if result == expected {
+		fmt.Printf("Success!! Result is: %v", result)
+	} else {
+		fmt.Printf("Failure! Expected %v, got %v", expected, result)
+	}
+	println()
 }

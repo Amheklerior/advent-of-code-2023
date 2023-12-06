@@ -1,4 +1,4 @@
-package main
+package day3
 
 import (
 	"bufio"
@@ -8,70 +8,14 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"unicode"
 )
 
-const PATH string = "./input.txt"
-
-type Part struct {
-	number string
-	pos    [2]int
+func TODO1(str string) int {
+	return len(str)
 }
 
-func isSpecialChar(char rune) bool {
-	return char != '.' && !unicode.IsDigit(char)
-}
-
-func (p *Part) isValid(mtx [][]rune) bool {
-	for i, _ := range p.number {
-		x, y := p.pos[0], p.pos[1]+i
-
-		onTopRow := x == 0
-		onBottomRow := x == len(mtx)-1
-		onFirstCol := y == 0
-		onLastCol := y == len(mtx[x])-1
-		onLeftmostDigit := i == 0
-		onRightmostDigit := i == len(p.number)-1
-
-		// check NORD
-		if onLeftmostDigit && !onTopRow && isSpecialChar(mtx[x-1][y]) {
-			return true
-		}
-		// check SOUTH
-		if onLeftmostDigit && !onBottomRow && isSpecialChar(mtx[x+1][y]) {
-			return true
-		}
-		// ckeck WEST
-		if onLeftmostDigit && !onFirstCol && isSpecialChar(mtx[x][y-1]) {
-			return true
-		}
-		// check EAST
-		if onRightmostDigit && !onLastCol && isSpecialChar(mtx[x][y+1]) {
-			return true
-		}
-		// check NW
-		if onLeftmostDigit && !onFirstCol && !onTopRow && isSpecialChar(mtx[x-1][y-1]) {
-			return true
-		}
-		// check NE
-		if !onLastCol && !onTopRow && isSpecialChar(mtx[x-1][y+1]) {
-			return true
-		}
-		// check SW
-		if onLeftmostDigit && !onFirstCol && !onBottomRow && isSpecialChar(mtx[x+1][y-1]) {
-			return true
-		}
-		// check SE
-		if !onLastCol && !onBottomRow && isSpecialChar(mtx[x+1][y+1]) {
-			return true
-		}
-	}
-
-	return false
-}
-
-func main() {
-	f, e := os.Open(PATH)
+func SolutionPart1(path string) int {
+	f, e := os.Open(path)
 	if e != nil {
 		log.Fatalf("Could not open the file: %s", e)
 	}
@@ -123,5 +67,18 @@ func main() {
 			sum += partId
 		}
 	}
-	fmt.Println(sum)
+	return sum
+}
+
+func TestP1() {
+	fmt.Println("Day 3 / Part 1: Test")
+	expected := 4361
+	result := SolutionPart1("./day3/data/p1-input.test.txt")
+
+	if result == expected {
+		fmt.Printf("Success!! Result is: %v", result)
+	} else {
+		fmt.Printf("Failure! Expected %v, got %v", expected, result)
+	}
+	println()
 }
