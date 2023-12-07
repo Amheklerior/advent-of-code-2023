@@ -6,6 +6,7 @@ import (
 	"amheklerior.com/advent-of-code-2023/day1"
 	"amheklerior.com/advent-of-code-2023/day2"
 	"amheklerior.com/advent-of-code-2023/day3"
+	"amheklerior.com/advent-of-code-2023/day4"
 )
 
 func input(day int) string {
@@ -23,6 +24,8 @@ func main() {
 	day2.TestP2()
 	day3.TestP1()
 	day3.TestP2()
+	day4.TestP1()
+	day4.TestP2()
 
 	println()
 
@@ -40,4 +43,10 @@ func main() {
 	fmt.Println()
 	fmt.Printf("Day 3 / Part 2 --> %v", day3.SolutionPart2(input(3)))
 	fmt.Println()
+
+	fmt.Printf("Day 4 / Part 1 --> %v", day4.SolutionPart1(input(4)))
+	fmt.Println()
+	fmt.Printf("Day 4 / Part 2 --> %v", day4.SolutionPart2(input(4)))
+	fmt.Println()
+
 }
