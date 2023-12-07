@@ -17,30 +17,6 @@ type Card struct {
 	count   int
 }
 
-type Deck struct {
-	index []int
-	cards map[int]*Card
-}
-
-func buildDeck(f *os.File) Deck {
-	var index []int
-	var cards map[int]*Card = make(map[int]*Card)
-
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		line := scanner.Text()
-
-		prefix := regexp.MustCompile(`Card\s+\d+:\s+`).FindString(line)
-		id, _ := strconv.Atoi(regexp.MustCompile(`\d+`).FindString(prefix))
-		line = strings.TrimPrefix(line, prefix)
-
-		index = append(index, id)
-		cards[id] = &Card{id, line, 1}
-	}
-
-	return Deck{index, cards}
-}
-
 func (card *Card) winningNumCount() int {
 	// split the number lists
 	list := strings.Split(card.content, "|")
@@ -59,6 +35,25 @@ func (card *Card) winningNumCount() int {
 	return wins
 }
 
+func buildDeck(f *os.File) []*Card {
+	var cards []*Card
+
+	// occupy slot 0 to keep alignment with card id
+	cards = append(cards, &Card{0, "", 0})
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		prefix := regexp.MustCompile(`Card\s+\d+:\s+`).FindString(line)
+		id, _ := strconv.Atoi(regexp.MustCompile(`\d+`).FindString(prefix))
+		line = strings.TrimPrefix(line, prefix)
+		cards = append(cards, &Card{id, line, 1})
+	}
+
+	return cards
+}
+
 func SolutionPart2(path string) int {
 	f, e := os.Open(path)
 	if e != nil {
@@ -67,13 +62,16 @@ func SolutionPart2(path string) int {
 	defer f.Close()
 
 	deck := buildDeck(f)
-	maxId := deck.index[len(deck.index)-1]
+	maxId := len(deck)
 
-	sum := len(deck.index)
+	sum := len(deck) - 1
 
 	// for each card in the deck...
-	for _, id := range deck.index {
-		card := deck.cards[id]
+	for id, card := range deck {
+		if id == 0 {
+			continue // skip first slot (no card)
+		}
+
 		wins := card.winningNumCount()
 
 		// count the won cards and add them back in the deck
@@ -81,7 +79,7 @@ func SolutionPart2(path string) int {
 			if card.id+i > maxId {
 				break
 			}
-			deck.cards[card.id+i].count += card.count
+			deck[id+i].count += card.count
 			sum += card.count
 		}
 	}
