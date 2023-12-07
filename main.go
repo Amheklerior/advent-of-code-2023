@@ -18,14 +18,14 @@ func main() {
 	fmt.Println("************ Advent Of Code 2023 ************")
 	println()
 
-	day1.TestP1()
-	day1.TestP2()
-	day2.TestP1()
-	day2.TestP2()
-	day3.TestP1()
-	day3.TestP2()
-	day4.TestP1()
-	day4.TestP2()
+	//day1.TestP1()
+	//day1.TestP2()
+	//day2.TestP1()
+	//day2.TestP2()
+	//day3.TestP1()
+	//day3.TestP2()
+	//day4.TestP1()
+	//day4.TestP2()
 
 	println()
 
