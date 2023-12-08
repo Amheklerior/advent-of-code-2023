@@ -2,13 +2,14 @@ package day4
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"math"
 	"os"
 	"regexp"
 	"slices"
 	"strings"
+
+	"amheklerior.com/advent-of-code-2023/utils"
 )
 
 func cardScore(card string) int {
@@ -54,14 +55,5 @@ func SolutionPart1(path string) int {
 }
 
 func TestP1() {
-	fmt.Println("Day 4 / Part 1: Test")
-	expected := 13
-	result := SolutionPart1("./day4/data/p1-input.test.txt")
-
-	if result == expected {
-		fmt.Printf("Success!! Result is: %v", result)
-	} else {
-		fmt.Printf("Failure! Expected %v, got %v", expected, result)
-	}
-	println()
+	utils.Run(4, 1, 13, SolutionPart1)
 }

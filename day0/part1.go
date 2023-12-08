@@ -2,9 +2,10 @@ package day0
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
+
+	"amheklerior.com/advent-of-code-2023/utils"
 )
 
 func TODO1(str string) int {
@@ -28,14 +29,5 @@ func SolutionPart1(path string) int {
 }
 
 func TestP1() {
-	fmt.Println("Day 0 / Part 1: Test")
-	expected := 142
-	result := SolutionPart1("./day0/data/p1-input.test.txt")
-
-	if result == expected {
-		fmt.Printf("Success!! Result is: %v", result)
-	} else {
-		fmt.Printf("Failure! Expected %v, got %v", expected, result)
-	}
-	println()
+	utils.Run(0, 1, -1, SolutionPart1)
 }

@@ -2,13 +2,14 @@ package day4
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"regexp"
 	"slices"
 	"strconv"
 	"strings"
+
+	"amheklerior.com/advent-of-code-2023/utils"
 )
 
 type Card struct {
@@ -88,14 +89,5 @@ func SolutionPart2(path string) int {
 }
 
 func TestP2() {
-	fmt.Println("Day 4 / Part 2: Test")
-	expected := 30
-	result := SolutionPart2("./day4/data/p2-input.test.txt")
-
-	if result == expected {
-		fmt.Printf("Success!! Result is: %v", result)
-	} else {
-		fmt.Printf("Failure! Expected %v, got %v", expected, result)
-	}
-	println()
+	utils.Run(4, 2, 30, SolutionPart2)
 }

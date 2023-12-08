@@ -4,13 +4,15 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"amheklerior.com/advent-of-code-2023/utils"
 )
 
 func BuildDataStructures(input string) [][][]int {
 	var pipeline [][][]int
 
 	mapId := -1
-	scanner := Scanner(input)
+	scanner := utils.Scanner(input)
 	for scanner.Scan() {
 		line := scanner.Text()
 

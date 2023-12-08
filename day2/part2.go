@@ -2,11 +2,12 @@ package day2
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"sort"
 	"strconv"
+
+	"amheklerior.com/advent-of-code-2023/utils"
 )
 
 func findMax(counts []string) int {
@@ -51,14 +52,5 @@ func SolutionPart2(path string) int {
 }
 
 func TestP2() {
-	fmt.Println("Day 2 / Part 2: Test")
-	expected := 2286
-	result := SolutionPart2("./day2/data/p2-input.test.txt")
-
-	if result == expected {
-		fmt.Printf("Success!! Result is: %v", result)
-	} else {
-		fmt.Printf("Failure! Expected %v, got %v", expected, result)
-	}
-	println()
+	utils.Run(2, 2, 2286, SolutionPart2)
 }

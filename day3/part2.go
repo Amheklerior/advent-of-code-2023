@@ -2,12 +2,13 @@ package day3
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"amheklerior.com/advent-of-code-2023/utils"
 )
 
 func TODO2(str string) int {
@@ -88,14 +89,5 @@ func SolutionPart2(path string) int {
 }
 
 func TestP2() {
-	fmt.Println("Day 3 / Part 2: Test")
-	expected := 467835
-	result := SolutionPart2("./day3/data/p2-input.test.txt")
-
-	if result == expected {
-		fmt.Printf("Success!! Result is: %v", result)
-	} else {
-		fmt.Printf("Failure! Expected %v, got %v", expected, result)
-	}
-	println()
+	utils.Run(3, 2, 467835, SolutionPart2)
 }

@@ -1,7 +1,6 @@
 package day5
 
 import (
-	"fmt"
 	"math"
 	"regexp"
 	"strconv"
@@ -9,13 +8,14 @@ import (
 	"sync"
 
 	"amheklerior.com/advent-of-code-2023/day5/lib"
+	"amheklerior.com/advent-of-code-2023/utils"
 )
 
 func extractSeedsInRanges(input string) []lib.Range {
 	var seeds []lib.Range
 
 	// grab first line without the prefix
-	scanner := lib.Scanner(input)
+	scanner := utils.Scanner(input)
 	scanner.Scan()
 	line := scanner.Text()
 	prefix := regexp.MustCompile(`seeds:`).FindString(line)
@@ -35,7 +35,7 @@ func extractSeedsInRanges(input string) []lib.Range {
 
 // computation time: ~6m40s
 func SolutionPart2(path string) int {
-	content := lib.ReadFile(path)
+	content := utils.ReadFile(path)
 	seeds := extractSeedsInRanges(content)
 	pipeline := lib.BuildDataStructures(content)
 
@@ -60,14 +60,5 @@ func SolutionPart2(path string) int {
 }
 
 func TestP2() {
-	fmt.Println("Day 5 / Part 2: Test")
-	expected := 46
-	result := SolutionPart2("./day5/data/p2-input.test.txt")
-
-	if result == expected {
-		fmt.Printf("Success!! Result is: %v", result)
-	} else {
-		fmt.Printf("Failure! Expected %v, got %v", expected, result)
-	}
-	println()
+	utils.Run(5, 2, 46, SolutionPart2)
 }

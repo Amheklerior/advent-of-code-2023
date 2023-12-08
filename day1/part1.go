@@ -6,14 +6,16 @@ import (
 	"log"
 	"os"
 	"strconv"
+
+	"amheklerior.com/advent-of-code-2023/utils"
 )
 
 func getCalibrationValueP1(line string) int {
 	// extract all digits in the line and take first and last
 	numbers, found := findDigits(line)
-  if !found {
-    return 0
-  }
+	if !found {
+		return 0
+	}
 
 	first := getFirst(numbers)
 	last := getLast(numbers)
@@ -41,14 +43,5 @@ func SolutionPart1(path string) int {
 }
 
 func TestP1() {
-	fmt.Println("Day 1 / Part 1: Test")
-	expected := 142
-	result := SolutionPart1("./day1/data/p1-input.test.txt")
-
-	if result == expected {
-		fmt.Printf("Success!! Result is: %v", result)
-	} else {
-		fmt.Printf("Failure! Expected %v, got %v", expected, result)
-	}
-  println()
+	utils.Run(1, 1, 142, SolutionPart1)
 }

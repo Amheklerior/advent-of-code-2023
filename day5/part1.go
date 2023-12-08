@@ -1,19 +1,26 @@
 package day5
 
 import (
-	"fmt"
 	"math"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"amheklerior.com/advent-of-code-2023/day5/lib"
+	"amheklerior.com/advent-of-code-2023/utils"
 )
 
-func extractSeeds(line string) []int {
+func extractSeeds(input string) []int {
 	var seeds []int
+
+	// grab the first line without the prefix
+	scanner := utils.Scanner(input)
+	scanner.Scan()
+	line := scanner.Text()
 	prefix := regexp.MustCompile(`seeds:`).FindString(line)
 	line = strings.TrimPrefix(line, prefix)
+
+	// extract all seeds
 	ids := strings.Fields(line)
 	for _, id := range ids {
 		seed, _ := strconv.Atoi(id)
@@ -23,9 +30,9 @@ func extractSeeds(line string) []int {
 }
 
 func SolutionPart1(path string) int {
-	content := lib.ReadFile(path)
+	content := utils.ReadFile(path)
 
-	seeds := extractSeeds(strings.SplitN(content, "\n", 1)[0])
+	seeds := extractSeeds(content)
 	pipeline := lib.BuildDataStructures(content)
 
 	minLocation := math.MaxInt
@@ -40,14 +47,5 @@ func SolutionPart1(path string) int {
 }
 
 func TestP1() {
-	fmt.Println("Day 5 / Part 1: Test")
-	expected := 35
-	result := SolutionPart1("./day5/data/p1-input.test.txt")
-
-	if result == expected {
-		fmt.Printf("Success!! Result is: %v", result)
-	} else {
-		fmt.Printf("Failure! Expected %v, got %v", expected, result)
-	}
-	println()
+	utils.Run(5, 1, 35, SolutionPart1)
 }
