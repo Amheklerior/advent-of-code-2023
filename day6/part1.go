@@ -8,42 +8,7 @@ import (
 	"amheklerior.com/advent-of-code-2023/utils"
 )
 
-func simulateDistance(totTime, chargeTime int) int {
-	const VELOCITY_CHARGE_PER_MS = 1
-	v := VELOCITY_CHARGE_PER_MS * chargeTime
-	d := v * (totTime - chargeTime)
-	return d
-}
-
-func findLowestChargeTime(totTime, record int) int {
-	chargeTime := 1
-	distance := simulateDistance(totTime, chargeTime)
-
-	for distance <= record {
-		chargeTime++
-		distance = simulateDistance(totTime, chargeTime)
-	}
-
-	return chargeTime
-}
-
-func findHighestChargeTime(totTime, record int) int {
-	chargeTime := totTime - 1
-	distance := simulateDistance(totTime, chargeTime)
-
-	for distance <= record {
-		chargeTime--
-		distance = simulateDistance(totTime, chargeTime)
-	}
-
-	return chargeTime
-}
-
-type Race struct {
-	totTime, record int
-}
-
-func extractData(content string) []Race {
+func extractRaces(content string) []Race {
 	var races []Race
 	var times []string
 	var distances []string
@@ -76,13 +41,9 @@ func extractData(content string) []Race {
 	return races
 }
 
-func getWaysToWin(race Race) int {
-	return findHighestChargeTime(race.totTime, race.record) - findLowestChargeTime(race.totTime, race.record) + 1
-}
-
 func SolutionPart1(path string) int {
 	content := utils.ReadFile(path)
-	races := extractData(content)
+	races := extractRaces(content)
 
 	result := 1
 	for _, race := range races {
