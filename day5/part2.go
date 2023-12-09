@@ -2,8 +2,6 @@ package day5
 
 import (
 	"math"
-	"regexp"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -18,15 +16,14 @@ func extractSeedsInRanges(input string) []lib.Range {
 	scanner := utils.Scanner(input)
 	scanner.Scan()
 	line := scanner.Text()
-	prefix := regexp.MustCompile(`seeds:`).FindString(line)
-	line = strings.TrimPrefix(line, prefix)
+	line, _ = utils.ExtractPrefix(line, `seeds:`)
 
 	// extract all seeds ranges
-	pairs := regexp.MustCompile(`\s*\d+\s+\d+\s*`).FindAllString(line, -1)
+	pairs := utils.GetOccurrences(line, `\s*\d+\s+\d+\s*`)
 	for _, pair := range pairs {
 		data := strings.Fields(pair)
-		rangeStart, _ := strconv.Atoi(data[0])
-		rangeLenght, _ := strconv.Atoi(data[1])
+		rangeStart := utils.ToInt(data[0])
+		rangeLenght := utils.ToInt(data[1])
 		seeds = append(seeds, lib.NewRange(rangeStart, rangeStart+rangeLenght))
 	}
 

@@ -1,11 +1,6 @@
 package day3
 
 import (
-	"bufio"
-	"log"
-	"os"
-	"regexp"
-	"strconv"
 	"strings"
 
 	"amheklerior.com/advent-of-code-2023/utils"
@@ -16,14 +11,8 @@ func TODO1(str string) int {
 }
 
 func SolutionPart1(path string) int {
-	f, e := os.Open(path)
-	if e != nil {
-		log.Fatalf("Could not open the file: %s", e)
-	}
-	defer f.Close()
-
-	r := regexp.MustCompile(`\d+`)
-	scanner := bufio.NewScanner(f)
+	content := utils.ReadFile(path)
+	scanner := utils.Scanner(content)
 
 	lineIdx := 0
 	var matrix [][]rune
@@ -39,7 +28,7 @@ func SolutionPart1(path string) int {
 		matrix = append(matrix, row)
 
 		// Collect the parts' info
-		numbers := r.FindAllString(line, -1)
+		numbers := utils.GetOccurrences(line, `\d+`)
 		for _, n := range numbers {
 			idx := strings.Index(line, n)
 			parts = append(parts, Part{
@@ -64,8 +53,7 @@ func SolutionPart1(path string) int {
 	for _, p := range parts {
 		isValid := p.isValid(matrix)
 		if isValid {
-			partId, _ := strconv.Atoi(p.number)
-			sum += partId
+			sum += utils.ToInt(p.number)
 		}
 	}
 	return sum

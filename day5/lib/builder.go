@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"regexp"
-	"strconv"
 	"strings"
 
 	"amheklerior.com/advent-of-code-2023/utils"
@@ -21,7 +19,7 @@ func BuildDataStructures(input string) [][][]int {
 			continue
 		}
 
-		prefix := regexp.MustCompile(`.+:`).FindString(line)
+		_, prefix := utils.ExtractPrefix(line, `.+:`)
 
 		// if its the heading of a new map, create a new one in the pipeline
 		if strings.Contains(prefix, "map") {
@@ -33,9 +31,8 @@ func BuildDataStructures(input string) [][][]int {
 		// it's a map instruction line
 		var values []int
 		data := strings.Fields(line)
-		for _, x := range data {
-			v, _ := strconv.Atoi(x)
-			values = append(values, v)
+		for _, v := range data {
+			values = append(values, utils.ToInt(v))
 		}
 		pipeline[mapId] = append(pipeline[mapId], values)
 	}

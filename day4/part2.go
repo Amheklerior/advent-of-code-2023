@@ -1,12 +1,7 @@
 package day4
 
 import (
-	"bufio"
-	"log"
-	"os"
-	"regexp"
 	"slices"
-	"strconv"
 	"strings"
 
 	"amheklerior.com/advent-of-code-2023/utils"
@@ -36,19 +31,18 @@ func (card *Card) winningNumCount() int {
 	return wins
 }
 
-func buildDeck(f *os.File) []*Card {
+func buildDeck(input string) []*Card {
 	var cards []*Card
 
 	// occupy slot 0 to keep alignment with card id
 	cards = append(cards, &Card{0, "", 0})
 
-	scanner := bufio.NewScanner(f)
+	scanner := utils.Scanner(input)
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		prefix := regexp.MustCompile(`Card\s+\d+:\s+`).FindString(line)
-		id, _ := strconv.Atoi(regexp.MustCompile(`\d+`).FindString(prefix))
-		line = strings.TrimPrefix(line, prefix)
+		line, prefix := utils.ExtractPrefix(line, `Card\s+\d+:\s+`)
+		id := utils.ToInt(utils.GetOccurrence(prefix, `\d+`))
 		cards = append(cards, &Card{id, line, 1})
 	}
 
@@ -56,13 +50,9 @@ func buildDeck(f *os.File) []*Card {
 }
 
 func SolutionPart2(path string) int {
-	f, e := os.Open(path)
-	if e != nil {
-		log.Fatalf("Could not open the file: %s", e)
-	}
-	defer f.Close()
+	content := utils.ReadFile(path)
 
-	deck := buildDeck(f)
+	deck := buildDeck(content)
 	maxId := len(deck)
 
 	sum := len(deck) - 1

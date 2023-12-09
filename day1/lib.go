@@ -1,8 +1,9 @@
 package day1
 
 import (
-	"regexp"
 	"strings"
+
+	"amheklerior.com/advent-of-code-2023/utils"
 )
 
 func getFirst(nums []string) string {
@@ -14,17 +15,17 @@ func getLast(nums []string) string {
 }
 
 func findDigits(str string) ([]string, bool) {
-	numbers := regexp.MustCompile(`\d`).FindAllString(str, -1)
+	numbers := utils.GetOccurrences(str, `\d`)
 	return numbers, len(numbers) > 0
 }
 
 func getPrefix(str string) (string, bool) {
-	prefix := regexp.MustCompile(`^\D+`).FindString(str)
+	_, prefix := utils.ExtractPrefix(str, `^\D+`)
 	return prefix, len(prefix) > 0
 }
 
 func getSuffix(str string) (string, bool) {
-	suffix := regexp.MustCompile(`\D+$`).FindString(str)
+	_, suffix := utils.ExtractSuffix(str, `\D+$`)
 	return suffix, len(suffix) > 0
 }
 

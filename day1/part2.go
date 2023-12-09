@@ -1,11 +1,7 @@
 package day1
 
 import (
-	"bufio"
 	"fmt"
-	"log"
-	"os"
-	"strconv"
 
 	"amheklerior.com/advent-of-code-2023/utils"
 )
@@ -43,19 +39,14 @@ func getCalibrationValueP2(line string) int {
 
 	// Concatenate the two digits found to create the whole line value
 	str_value := fmt.Sprintf("%s%s", first, last)
-	value, _ := strconv.Atoi(str_value)
-	return value
+	return utils.ToInt(str_value)
 }
 
 func SolutionPart2(path string) int {
-	f, e := os.Open(path)
-	if e != nil {
-		log.Fatalf("Could not open the file: %s", e)
-	}
-	defer f.Close()
+	content := utils.ReadFile(path)
+	scanner := utils.Scanner(content)
 
 	sum := 0
-	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Text()
 		sum += getCalibrationValueP2(line)

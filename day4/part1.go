@@ -1,21 +1,15 @@
 package day4
 
 import (
-	"bufio"
-	"log"
 	"math"
-	"os"
-	"regexp"
 	"slices"
 	"strings"
 
 	"amheklerior.com/advent-of-code-2023/utils"
 )
 
-func cardScore(card string) int {
-	// remove the prefix
-	prefix := regexp.MustCompile(`Card \d+: `).FindString(card)
-	card = strings.TrimPrefix(card, prefix)
+func cardScore(line string) int {
+	card, _ := utils.ExtractPrefix(line, `Card \d+: `)
 
 	// split the number lists
 	list := strings.Split(card, "|")
@@ -39,14 +33,10 @@ func cardScore(card string) int {
 }
 
 func SolutionPart1(path string) int {
-	f, e := os.Open(path)
-	if e != nil {
-		log.Fatalf("Could not open the file: %s", e)
-	}
-	defer f.Close()
+	content := utils.ReadFile(path)
+	scanner := utils.Scanner(content)
 
 	sum := 0
-	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Text()
 		sum += cardScore(line)

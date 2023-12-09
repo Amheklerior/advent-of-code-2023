@@ -1,12 +1,6 @@
 package day2
 
 import (
-	"bufio"
-	"log"
-	"os"
-	"strconv"
-	"strings"
-
 	"amheklerior.com/advent-of-code-2023/utils"
 )
 
@@ -16,8 +10,7 @@ const MAX_BLUE int = 14
 
 func areCountsWithinRange(counts []string, maxCount int) bool {
 	for _, v := range counts {
-		count, _ := strconv.Atoi(v)
-		if count > maxCount {
+		if utils.ToInt(v) > maxCount {
 			return false
 		}
 	}
@@ -40,24 +33,20 @@ func isValid(game string) bool {
 }
 
 func SolutionPart1(path string) int {
-	f, e := os.Open(path)
-	if e != nil {
-		log.Fatalf("Could not open the file: %s", e)
-	}
-	defer f.Close()
+	content := utils.ReadFile(path)
+	scanner := utils.Scanner(content)
 
 	sum := 0
-	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Text()
 
 		// Extract the game id
-		gameId, _ := strings.CutPrefix(strings.Split(line, ":")[0], "Game ")
-		id, _ := strconv.Atoi(gameId)
+		_, prefix := utils.ExtractPrefix(line, `Game\s+\d+:`)
+		gameId := utils.GetOccurrence(prefix, `\d+`)
 
 		isValidGame := isValid(line)
 		if isValidGame {
-			sum += id
+			sum += utils.ToInt(gameId)
 		}
 	}
 	return sum

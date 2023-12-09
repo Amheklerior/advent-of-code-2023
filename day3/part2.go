@@ -1,30 +1,14 @@
 package day3
 
 import (
-	"bufio"
-	"log"
-	"os"
-	"regexp"
-	"strconv"
 	"strings"
 
 	"amheklerior.com/advent-of-code-2023/utils"
 )
 
-func TODO2(str string) int {
-	return len(str)
-}
-
 func SolutionPart2(path string) int {
-	f, e := os.Open(path)
-	if e != nil {
-		log.Fatalf("Could not open the file: %s", e)
-	}
-	defer f.Close()
-
-	r := regexp.MustCompile(`\d+`)
-	s := regexp.MustCompile(`\*`)
-	scanner := bufio.NewScanner(f)
+	content := utils.ReadFile(path)
+	scanner := utils.Scanner(content)
 
 	lineIdx := 0
 	var matrix [][]rune
@@ -41,7 +25,7 @@ func SolutionPart2(path string) int {
 		matrix = append(matrix, row)
 
 		// Collect the parts' info
-		numbers := r.FindAllString(line, -1)
+		numbers := utils.GetOccurrences(line, `\d+`)
 		for _, n := range numbers {
 			idx := strings.Index(line, n)
 			parts = append(parts, Part{
@@ -59,7 +43,7 @@ func SolutionPart2(path string) int {
 		}
 
 		// Collect the gears info
-		asterics := s.FindAllString(line, -1)
+		asterics := utils.GetOccurrences(line, `\*`)
 		for _, a := range asterics {
 			idx := strings.Index(line, a)
 			gears = append(gears, Gear{lineIdx, idx})
@@ -77,8 +61,7 @@ func SolutionPart2(path string) int {
 			verticallyWithinBoundary := part.pos[0] >= gear.x-1 && part.pos[0] <= gear.x+1
 			horizontallyWithinBoundary := part.pos[1] >= gear.y-len(part.number) && part.pos[1] <= gear.y+1
 			if verticallyWithinBoundary && horizontallyWithinBoundary {
-				num, _ := strconv.Atoi(part.number)
-				adjacents = append(adjacents, num)
+				adjacents = append(adjacents, utils.ToInt(part.number))
 			}
 		}
 		if len(adjacents) == 2 {

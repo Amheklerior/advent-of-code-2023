@@ -1,8 +1,6 @@
 package day6
 
 import (
-	"regexp"
-	"strconv"
 	"strings"
 
 	"amheklerior.com/advent-of-code-2023/utils"
@@ -18,24 +16,23 @@ func extractRaces(content string) []Race {
 		line := scanner.Text()
 
 		if strings.Contains(line, "Time") {
-			prefix := regexp.MustCompile(`Time:`).FindString(line)
-			line = strings.TrimPrefix(line, prefix)
+			line, _ = utils.ExtractPrefix(line, `Time:`)
 			times = append(times, strings.Fields(line)...)
 			continue
 		}
 
 		if strings.Contains(line, "Distance") {
-			prefix := regexp.MustCompile(`Distance:`).FindString(line)
-			line = strings.TrimPrefix(line, prefix)
+			line, _ = utils.ExtractPrefix(line, `Distance:`)
 			distances = append(distances, strings.Fields(line)...)
 			continue
 		}
 	}
 
-	for i, t := range times {
-		time, _ := strconv.Atoi(t)
-		distance, _ := strconv.Atoi(distances[i])
-		races = append(races, Race{time, distance})
+	for i, time := range times {
+		races = append(races, Race{
+			utils.ToInt(time),
+			utils.ToInt(distances[i]),
+		})
 	}
 
 	return races

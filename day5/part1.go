@@ -2,8 +2,6 @@ package day5
 
 import (
 	"math"
-	"regexp"
-	"strconv"
 	"strings"
 
 	"amheklerior.com/advent-of-code-2023/day5/lib"
@@ -16,15 +14,12 @@ func extractSeeds(input string) []int {
 	// grab the first line without the prefix
 	scanner := utils.Scanner(input)
 	scanner.Scan()
-	line := scanner.Text()
-	prefix := regexp.MustCompile(`seeds:`).FindString(line)
-	line = strings.TrimPrefix(line, prefix)
+	line, _ := utils.ExtractPrefix(scanner.Text(), `seeds:`)
 
 	// extract all seeds
 	ids := strings.Fields(line)
 	for _, id := range ids {
-		seed, _ := strconv.Atoi(id)
-		seeds = append(seeds, seed)
+		seeds = append(seeds, utils.ToInt(id))
 	}
 	return seeds
 }

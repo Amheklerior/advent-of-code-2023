@@ -1,22 +1,16 @@
 package day2
 
 import (
-	"bufio"
-	"log"
-	"os"
 	"sort"
-	"strconv"
 
 	"amheklerior.com/advent-of-code-2023/utils"
 )
 
 func findMax(counts []string) int {
 	sort.Slice(counts, func(i, j int) bool {
-		n1, _ := strconv.Atoi(counts[i])
-		n2, _ := strconv.Atoi(counts[j])
-		return n1 < n2
+		return utils.ToInt(counts[i]) < utils.ToInt(counts[j])
 	})
-	max, _ := strconv.Atoi(counts[len(counts)-1])
+	max := utils.ToInt(counts[len(counts)-1])
 	return max
 }
 
@@ -35,14 +29,10 @@ func fewestNumberOfCubes(game string) (int, int, int) {
 }
 
 func SolutionPart2(path string) int {
-	f, e := os.Open(path)
-	if e != nil {
-		log.Fatalf("Could not open the file: %s", e)
-	}
-	defer f.Close()
+	content := utils.ReadFile(path)
 
 	sum := 0
-	scanner := bufio.NewScanner(f)
+	scanner := utils.Scanner(content)
 	for scanner.Scan() {
 		line := scanner.Text()
 		red, green, blue := fewestNumberOfCubes(line)
