@@ -3,12 +3,7 @@ package main
 import (
 	"fmt"
 
-	"amheklerior.com/advent-of-code-2023/day1"
-	"amheklerior.com/advent-of-code-2023/day2"
-	"amheklerior.com/advent-of-code-2023/day3"
-	"amheklerior.com/advent-of-code-2023/day4"
-	"amheklerior.com/advent-of-code-2023/day5"
-	"amheklerior.com/advent-of-code-2023/day6"
+	"amheklerior.com/advent-of-code-2023/day7"
 )
 
 func input(day int) string {
@@ -19,18 +14,19 @@ func main() {
 	fmt.Println("************ Advent Of Code 2023 ************")
 	println()
 
-	day1.TestP1()
-	day1.TestP2()
-	day2.TestP1()
-	day2.TestP2()
-	day3.TestP1()
-	day3.TestP2()
-	day4.TestP1()
-	day4.TestP2()
-	day5.TestP1()
-	day5.TestP2()
-	day6.TestP1()
-	day6.TestP2()
+	// day1.TestP1()
+	// day1.TestP2()
+	// day2.TestP1()
+	// day2.TestP2()
+	// day3.TestP1()
+	// day3.TestP2()
+	// day4.TestP1()
+	// day4.TestP2()
+	// day5.TestP1()
+	// day5.TestP2()
+	// day6.TestP1()
+	// day6.TestP2()
+	// day7.TestP1()
 
 	println()
 
@@ -65,5 +61,8 @@ func main() {
 	fmt.Printf("Day 6 / Part 2 --> %v", day6.SolutionPart2(input(6)))
 	fmt.Println()
 	*/
+
+	fmt.Printf("Day 7 / Part 1 --> %v", day7.SolutionPart1(input(7)))
+	fmt.Println()
 
 }
