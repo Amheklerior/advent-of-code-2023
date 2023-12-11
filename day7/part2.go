@@ -5,12 +5,12 @@ import (
 	"amheklerior.com/advent-of-code-2023/utils"
 )
 
-func SolutionPart1(path string) int {
+func SolutionPart2(path string) int {
 	content := utils.ReadFile(path)
-	game := game.NewCamelGame(content, false)
+	game := game.NewCamelGame(content, true)
 	return game.Score()
 }
 
-func TestP1() {
-	utils.Run(7, 1, 6440, SolutionPart1)
+func TestP2() {
+	utils.Run(7, 2, 5905, SolutionPart2)
 }

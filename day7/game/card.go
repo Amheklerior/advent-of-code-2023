@@ -16,6 +16,7 @@ const (
 	FOUR  Card = '4'
 	THREE Card = '3'
 	TWO   Card = '2'
+	JOLLY Card = '*'
 )
 
 var cardValues = map[Card]int{
@@ -32,6 +33,7 @@ var cardValues = map[Card]int{
 	FOUR:  4,
 	THREE: 3,
 	TWO:   2,
+	JOLLY: 1,
 }
 
 func compareCards(card1, card2 Card) int {

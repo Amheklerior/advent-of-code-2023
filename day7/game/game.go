@@ -2,21 +2,26 @@ package game
 
 import (
 	"slices"
+	"strings"
 
 	"amheklerior.com/advent-of-code-2023/utils"
 )
 
 type CamelGame struct {
-	hands []Hand
+	hands      []Hand
+	useJollies bool
 }
 
-func NewCamelGame(input string) CamelGame {
+func NewCamelGame(input string, useJollies bool) CamelGame {
 	var hands []Hand
+	if useJollies {
+		input = strings.ReplaceAll(input, string(JACK), string(JOLLY))
+	}
 	scanner := utils.Scanner(input)
 	for scanner.Scan() {
 		hands = append(hands, NewHand(scanner.Text()))
 	}
-	return CamelGame{hands}
+	return CamelGame{hands, useJollies}
 }
 
 func (game *CamelGame) Score() int {
