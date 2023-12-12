@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-
-	"amheklerior.com/advent-of-code-2023/day9"
 )
 
 func input(day int) string {
@@ -31,6 +29,7 @@ func main() {
 	// day8.TestP1()
 	// day8.TestP2()
 	// day9.TestP1()
+	// day9.TestP2()
 
 	println()
 
@@ -75,8 +74,10 @@ func main() {
 	fmt.Printf("Day 8 / Part 2 --> %v", day8.SolutionPart2(input(8)))
 	fmt.Println()
 
-	*/
 	fmt.Printf("Day 9 / Part 1 --> %v", day9.SolutionPart1(input(9)))
 	fmt.Println()
+	fmt.Printf("Day 9 / Part 2 --> %v", day9.SolutionPart2(input(9)))
+	fmt.Println()
+	*/
 
 }

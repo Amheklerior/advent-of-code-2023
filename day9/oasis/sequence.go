@@ -36,6 +36,23 @@ func (s *Sequence) Next() int {
 	return next
 }
 
+func (s *Sequence) Previous() int {
+	reduced := *s
+	reductionStack := []Sequence{reduced}
+	fmt.Printf("%v\n", reduced)
+	for !reduced.IsZeroSequence() {
+		reduced = reduced.Reduce()
+		fmt.Printf("%v\n", reduced)
+		reductionStack = slices.Insert(reductionStack, 0, reduced)
+	}
+	previous := 0
+	for _, seq := range reductionStack {
+		previous = seq[0] - previous
+	}
+	fmt.Printf("Previous: %v\n\n", previous)
+	return previous
+}
+
 func (s *Sequence) Reduce() Sequence {
 	this := *s
 	length := len(this)

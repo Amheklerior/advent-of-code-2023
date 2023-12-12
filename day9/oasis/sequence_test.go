@@ -15,6 +15,17 @@ func TestNext(t *testing.T) {
 	}
 }
 
+func TestPrevious(t *testing.T) {
+	input := Sequence{10, 13, 16, 21, 30, 45}
+	expected := 5
+
+	result := input.Previous()
+
+	if result != expected {
+		t.Errorf("Error calculating previous item in sequence %v. Expected %v, got %v instead", input, expected, result)
+	}
+}
+
 func TestReduce(t *testing.T) {
 	input := Sequence{1, 3, 6, 8}
 	expected := Sequence{2, 3, 2}

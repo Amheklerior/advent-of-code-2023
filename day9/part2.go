@@ -7,7 +7,7 @@ import (
 	"amheklerior.com/advent-of-code-2023/utils"
 )
 
-func SolutionPart1(path string) int {
+func SolutionPart2(path string) int {
 	content := utils.ReadFile(path)
 	sequences := oasis.ParseInput(content)
 	var wg sync.WaitGroup
@@ -16,13 +16,13 @@ func SolutionPart1(path string) int {
 		wg.Add(1)
 		go func(sequence oasis.Sequence) {
 			defer wg.Done()
-			sum += sequence.Next()
+			sum += sequence.Previous()
 		}(seq)
 	}
 	wg.Wait()
 	return sum
 }
 
-func TestP1() {
-	utils.Run(9, 1, 114, SolutionPart1)
+func TestP2() {
+	utils.Run(9, 2, 2, SolutionPart2)
 }
