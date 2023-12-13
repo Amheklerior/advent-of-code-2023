@@ -21,23 +21,23 @@ func BuildTerrain(input string) Terrain {
 	return terrain
 }
 
-func (t Terrain) At(p Position) Tile {
-	return t[p.i][p.j]
+func (t *Terrain) At(p Position) Tile {
+	return (*t)[p.i][p.j]
 }
 
-func (t Terrain) Height() int {
-	return len(t)
+func (t *Terrain) Height() int {
+	return len(*t)
 }
 
-func (t Terrain) Width() int {
+func (t *Terrain) Width() int {
 	if t.Height() == 0 {
 		return 0
 	}
-	return len(t[0])
+	return len((*t)[0])
 }
 
-func (t Terrain) PositionOfTile(tile Tile) *Position {
-	for i, row := range [][]Tile(t) {
+func (t *Terrain) PositionOfTile(tile Tile) *Position {
+	for i, row := range [][]Tile(*t) {
 		for j, item := range row {
 			if item == tile {
 				return &Position{i, j}
@@ -84,20 +84,18 @@ func (terrain *Terrain) FollowPipe(currentPipePosition, comingFrom Position) Pos
 	return nextPipe
 }
 
-// Simple version
-// it might be optimised going in both direction simultaneously
-// and stop when the two paths collide)
-func (t *Terrain) BuildPipePath() []Pipe {
-	var pipes []Pipe
+func (t *Terrain) BuildPipeLoop() PipeLoop {
+	var loop PipeLoop
 	entrypoint := t.PositionOfTile(ENTRY)
 	currPos, prevPos := *entrypoint, *entrypoint
-	pipes = append(pipes, Pipe(ENTRY))
+	loop.Add(Pipe(ENTRY), currPos)
 
-	for t.At(currPos) != ENTRY || len(pipes) <= 1 {
+	for t.At(currPos) != ENTRY || len(loop) <= 1 {
 		nextPos := t.FollowPipe(currPos, prevPos)
-		pipes = append(pipes, Pipe(t.At(nextPos)))
+		pipe := Pipe(t.At(nextPos))
+		loop.Add(pipe, nextPos)
 		prevPos, currPos = currPos, nextPos
 	}
 
-	return pipes
+	return loop
 }

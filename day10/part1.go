@@ -8,8 +8,8 @@ import (
 func SolutionPart1(path string) int {
 	content := utils.ReadFile(path)
 	terrain := maze.BuildTerrain(content)
-	pipePath := terrain.BuildPipePath()
-	return len(pipePath) / 2
+	pipeLoop := terrain.BuildPipeLoop()
+	return len(pipeLoop) / 2
 }
 
 func TestP1() {
