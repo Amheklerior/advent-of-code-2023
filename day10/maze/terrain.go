@@ -83,3 +83,21 @@ func (terrain *Terrain) FollowPipe(currentPipePosition, comingFrom Position) Pos
 	}
 	return nextPipe
 }
+
+// Simple version
+// it might be optimised going in both direction simultaneously
+// and stop when the two paths collide)
+func (t *Terrain) BuildPipePath() []Pipe {
+	var pipes []Pipe
+	entrypoint := t.PositionOfTile(ENTRY)
+	currPos, prevPos := *entrypoint, *entrypoint
+	pipes = append(pipes, Pipe(ENTRY))
+
+	for t.At(currPos) != ENTRY || len(pipes) <= 1 {
+		nextPos := t.FollowPipe(currPos, prevPos)
+		pipes = append(pipes, Pipe(t.At(nextPos)))
+		prevPos, currPos = currPos, nextPos
+	}
+
+	return pipes
+}

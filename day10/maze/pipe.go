@@ -8,7 +8,7 @@ import (
 type Pipe Tile
 
 var connectionsFor map[Pipe][]Direction = map[Pipe][]Direction{
-	Pipe(ENTRY):              {NORTH, SOUTH, EAST, WEST},
+	Pipe(ENTRY):              {WEST, EAST, SOUTH, NORTH},
 	Pipe(VERTICAL_PIPE):      {NORTH, SOUTH},
 	Pipe(HORIZONTAL_PIPE):    {EAST, WEST},
 	Pipe(NORTH_TO_EAST_BEND): {NORTH, EAST},

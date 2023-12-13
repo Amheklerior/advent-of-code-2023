@@ -15,7 +15,7 @@ func TestTerrainBuilding(t *testing.T) {
 	}{
 		{
 			"Build test #1",
-			"../data/p1-input.test.txt",
+			"../data/shortpipe.test.txt",
 			Terrain{
 				{GROUND, GROUND, GROUND, GROUND, GROUND},
 				{GROUND, ENTRY, HORIZONTAL_PIPE, SOUTH_TO_WEST_BEND, GROUND},
@@ -25,7 +25,7 @@ func TestTerrainBuilding(t *testing.T) {
 			},
 		}, {
 			"Build test #2",
-			"../data/p2-input.test.txt",
+			"../data/longpipe.test.txt",
 			Terrain{
 				{GROUND, GROUND, SOUTH_TO_EAST_BEND, SOUTH_TO_WEST_BEND, GROUND},
 				{GROUND, SOUTH_TO_EAST_BEND, NORTH_TO_WEST_BEND, VERTICAL_PIPE, GROUND},
@@ -71,7 +71,6 @@ func TestAdjacentPipeFinding(t *testing.T) {
 		{"Properly follows the pipe #5 (on right boundary)", Position{2, 4}, Position{2, 3}, Position{3, 4}},
 		{"Properly follows the pipe #6 (on top boundary)", Position{0, 2}, Position{1, 2}, Position{0, 3}},
 		{"Properly follows the pipe #6 (on bottom boundary)", Position{4, 0}, Position{4, 1}, Position{3, 0}},
-		// {"Logs an error there's no pipe to follow in current position", Position{0, 0}, Position{0, 0}, Position{0, 0}},
 	}
 
 	for _, tt := range testCases {
@@ -84,8 +83,21 @@ func TestAdjacentPipeFinding(t *testing.T) {
 	}
 }
 
-func TestPositionOfTile(t *testing.T) {
+func TestPathFindingFromEntrypoint(t *testing.T) {
+	terrain := Terrain{
+		{GROUND, HORIZONTAL_PIPE, ENTRY},
+		{VERTICAL_PIPE, ENTRY, HORIZONTAL_PIPE},
+		{GROUND, VERTICAL_PIPE, GROUND},
+	}
+	expected := Position{2, 1}
 
+	answer := terrain.FollowPipe(Position{1, 1}, Position{1, 1})
+	if answer != expected {
+		t.Errorf("Got %v, expected %v", answer, expected)
+	}
+}
+
+func TestPositionOfTile(t *testing.T) {
 	testCases := []struct {
 		testName string
 		terrain  Terrain
@@ -149,6 +161,73 @@ func TestPositionOfTile(t *testing.T) {
 			}
 			if tt.expected != nil && *answer != *tt.expected {
 				t.Errorf("Got %v, expected %v", *answer, *tt.expected)
+			}
+		})
+	}
+}
+
+func TestBuildPipePath(t *testing.T) {
+	testCases := []struct {
+		testName string
+		terrain  Terrain
+		expected []Pipe
+	}{
+		{
+			"Build test #1",
+			Terrain{
+				{GROUND, GROUND, GROUND, GROUND, GROUND},
+				{GROUND, ENTRY, HORIZONTAL_PIPE, SOUTH_TO_WEST_BEND, GROUND},
+				{GROUND, VERTICAL_PIPE, GROUND, VERTICAL_PIPE, GROUND},
+				{GROUND, NORTH_TO_EAST_BEND, HORIZONTAL_PIPE, NORTH_TO_WEST_BEND, GROUND},
+				{GROUND, GROUND, GROUND, GROUND, GROUND},
+			},
+			[]Pipe{
+				Pipe(ENTRY),
+				Pipe(VERTICAL_PIPE),
+				Pipe(NORTH_TO_EAST_BEND),
+				Pipe(HORIZONTAL_PIPE),
+				Pipe(NORTH_TO_WEST_BEND),
+				Pipe(VERTICAL_PIPE),
+				Pipe(SOUTH_TO_WEST_BEND),
+				Pipe(HORIZONTAL_PIPE),
+				Pipe(ENTRY),
+			},
+		}, {
+			"Build test #2",
+			Terrain{
+				{GROUND, GROUND, SOUTH_TO_EAST_BEND, SOUTH_TO_WEST_BEND, GROUND},
+				{GROUND, SOUTH_TO_EAST_BEND, NORTH_TO_WEST_BEND, VERTICAL_PIPE, GROUND},
+				{ENTRY, NORTH_TO_WEST_BEND, GROUND, NORTH_TO_EAST_BEND, SOUTH_TO_WEST_BEND},
+				{VERTICAL_PIPE, SOUTH_TO_EAST_BEND, HORIZONTAL_PIPE, HORIZONTAL_PIPE, NORTH_TO_WEST_BEND},
+				{NORTH_TO_EAST_BEND, NORTH_TO_WEST_BEND, GROUND, GROUND, GROUND},
+			},
+			[]Pipe{
+				Pipe(ENTRY),
+				Pipe(VERTICAL_PIPE),
+				Pipe(NORTH_TO_EAST_BEND),
+				Pipe(NORTH_TO_WEST_BEND),
+				Pipe(SOUTH_TO_EAST_BEND),
+				Pipe(HORIZONTAL_PIPE),
+				Pipe(HORIZONTAL_PIPE),
+				Pipe(NORTH_TO_WEST_BEND),
+				Pipe(SOUTH_TO_WEST_BEND),
+				Pipe(NORTH_TO_EAST_BEND),
+				Pipe(VERTICAL_PIPE),
+				Pipe(SOUTH_TO_WEST_BEND),
+				Pipe(SOUTH_TO_EAST_BEND),
+				Pipe(NORTH_TO_WEST_BEND),
+				Pipe(SOUTH_TO_EAST_BEND),
+				Pipe(NORTH_TO_WEST_BEND),
+				Pipe(ENTRY),
+			},
+		},
+	}
+
+	for _, tt := range testCases {
+		t.Run(tt.testName, func(t *testing.T) {
+			answer := tt.terrain.BuildPipePath()
+			if !slices.Equal(answer, tt.expected) {
+				t.Errorf("Got %v, expected %v", answer, tt.expected)
 			}
 		})
 	}
