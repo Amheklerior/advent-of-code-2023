@@ -1,18 +1,30 @@
 package maze
 
-import "slices"
+import (
+	"slices"
+)
 
-type LoopPortion struct {
-	pipe Pipe
-	pos  Position
+type LoopPath []Position
+
+func BuildPipeLoop(t *Terrain) LoopPath {
+	var loop LoopPath
+	entrypoint := FindEntryPosition(t)
+	currPos, prevPos := *entrypoint, *entrypoint
+	loop.Add(currPos)
+
+	for t.At(currPos) != ENTRY || len(loop) <= 1 {
+		nextPos, _ := FollowPipe(t, currPos, prevPos)
+		loop.Add(nextPos)
+		prevPos, currPos = currPos, nextPos
+	}
+
+	return loop
 }
 
-type PipeLoop []LoopPortion
-
-func (loop *PipeLoop) Add(pipe Pipe, position Position) {
-	*loop = append([]LoopPortion(*loop), LoopPortion{pipe, position})
+func (loop *LoopPath) Add(pos Position) {
+	*loop = append(*loop, pos)
 }
 
-func (loop *PipeLoop) Contains(portion LoopPortion) bool {
-	return slices.Contains(*loop, portion)
+func (loop *LoopPath) Contains(pos Position) bool {
+	return slices.Contains(*loop, pos)
 }

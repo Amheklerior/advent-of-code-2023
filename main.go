@@ -33,7 +33,7 @@ func main() {
 	// day9.TestP1()
 	// day9.TestP2()
 	// day10.TestP1()
-	// day10.TestP2()
+	day10.TestP2()
 
 	println()
 

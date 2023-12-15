@@ -1,6 +1,8 @@
 package maze
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type State rune
 
@@ -12,123 +14,119 @@ const (
 )
 
 type FSM struct {
-	currentState State
-	Count        int
-	terrain      Terrain
-	loop         PipeLoop
-	enteringWith *Pipe
-	exitingWith  *Pipe
+	currentState      State
+	Count             int
+	terrain           Terrain
+	loop              LoopPath
+	transitioningWith *Pipe
 }
 
-func NewFSM(terrain Terrain, loop PipeLoop) FSM {
+func NewFSM(terrain Terrain, loop LoopPath) FSM {
 	return FSM{
-		currentState: OUTSIDE,
-		Count:        0,
-		terrain:      terrain,
-		loop:         loop,
-		enteringWith: new(Pipe),
-		exitingWith:  new(Pipe),
+		currentState:      OUTSIDE,
+		Count:             0,
+		terrain:           terrain,
+		loop:              loop,
+		transitioningWith: new(Pipe),
 	}
 }
 
-func (fsm *FSM) transitTo(state State) {
+func (fsm *FSM) transitTo(state State, pipe *Pipe) {
 	fsm.currentState = state
+	if pipe != nil {
+		fsm.transitioningWith = pipe
+	}
 }
 
-func (fsm *FSM) IsPartOfTheLoop(tile Tile, pos Position) bool {
-	return fsm.loop.Contains(LoopPortion{Pipe(tile), pos})
+func (fsm *FSM) Solve() int {
+	fsm.terrain.ForEach(func(tile Tile, i, j int) {
+		fsm.Process(Position{i, j})
+	})
+	return fsm.Count
 }
 
-func (fsm *FSM) Process(position Position) {
-	tile := fsm.terrain.At(position)
+func (fsm *FSM) Process(pos Position) {
+	tile := fsm.terrain.At(pos)
 
 	// fmt.Printf("%vprocessing tile %v in position (%v,%v)\n", fsm, string(tile), position.i, position.j)
 	switch fsm.currentState {
 	case OUTSIDE:
 		// fmt.Printf("Processing OUTSIDE state...\n")
-		if !fsm.IsPartOfTheLoop(tile, position) {
+		if !fsm.loop.Contains(pos) {
 			// fmt.Printf("%v is not part of the loop\n", string(tile))
 			return
 		}
 		if tile == ENTRY {
-			tile = Tile(IdentyfyEntryPipeType(fsm.terrain, position))
+			tile = Tile(IdentyfyEntryPipeType(&fsm.terrain, pos))
 		}
 		if tile == VERTICAL_PIPE {
-			fsm.transitTo(INSIDE)
+			fsm.transitTo(INSIDE, nil)
 			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
 			return
 		}
 		if tile == SOUTH_TO_EAST_BEND || tile == NORTH_TO_EAST_BEND {
-			*fsm.enteringWith = Pipe(tile)
-			fsm.transitTo(ENTERING)
+			pipe := Pipe(tile)
+			fsm.transitTo(ENTERING, &pipe)
 			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
 			return
 		}
 	case INSIDE:
 		// fmt.Printf("Processing INSIDE state...\n")
-		if tile == GROUND || !fsm.IsPartOfTheLoop(tile, position) {
+		if tile == GROUND || !fsm.loop.Contains(pos) {
 			fsm.Count++
 			// fmt.Printf("Updated count to %v in position (%v,%v)\n", fsm.Count, position.i, position.j)
 			return
 		}
 		if tile == ENTRY {
-			tile = Tile(IdentyfyEntryPipeType(fsm.terrain, position))
+			tile = Tile(IdentyfyEntryPipeType(&fsm.terrain, pos))
 		}
 		if tile == VERTICAL_PIPE {
-			fsm.transitTo(OUTSIDE)
+			fsm.transitTo(OUTSIDE, nil)
 			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
 			return
 		}
 		if tile == SOUTH_TO_EAST_BEND || tile == NORTH_TO_EAST_BEND {
-			*fsm.exitingWith = Pipe(tile)
-			fsm.transitTo(EXITING)
+			pipe := Pipe(tile)
+			fsm.transitTo(EXITING, &pipe)
 			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
 			return
 		}
 	case ENTERING:
 		// fmt.Printf("Processing ENTERING state...\n")
-		if (*fsm.enteringWith == Pipe(NORTH_TO_EAST_BEND) && tile == SOUTH_TO_WEST_BEND) ||
-			(*fsm.enteringWith == Pipe(SOUTH_TO_EAST_BEND) && tile == NORTH_TO_WEST_BEND) {
-			fsm.enteringWith = new(Pipe)
-			fsm.transitTo(INSIDE)
+		if (*fsm.transitioningWith == Pipe(NORTH_TO_EAST_BEND) && tile == SOUTH_TO_WEST_BEND) ||
+			(*fsm.transitioningWith == Pipe(SOUTH_TO_EAST_BEND) && tile == NORTH_TO_WEST_BEND) {
+			fsm.transitTo(INSIDE, new(Pipe))
 			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
 			return
 		}
-		if (*fsm.enteringWith == Pipe(NORTH_TO_EAST_BEND) && tile == NORTH_TO_WEST_BEND) ||
-			(*fsm.enteringWith == Pipe(SOUTH_TO_EAST_BEND) && tile == SOUTH_TO_WEST_BEND) {
-			fsm.enteringWith = new(Pipe)
-			fsm.transitTo(OUTSIDE)
+		if (*fsm.transitioningWith == Pipe(NORTH_TO_EAST_BEND) && tile == NORTH_TO_WEST_BEND) ||
+			(*fsm.transitioningWith == Pipe(SOUTH_TO_EAST_BEND) && tile == SOUTH_TO_WEST_BEND) {
+			fsm.transitTo(OUTSIDE, new(Pipe))
 			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
 			return
 		}
 	case EXITING:
 		// fmt.Printf("Processing EXITING state...\n\n")
-		if (*fsm.exitingWith == Pipe(NORTH_TO_EAST_BEND) && tile == SOUTH_TO_WEST_BEND) ||
-			(*fsm.exitingWith == Pipe(SOUTH_TO_EAST_BEND) && tile == NORTH_TO_WEST_BEND) {
-			fsm.exitingWith = new(Pipe)
-			fsm.transitTo(OUTSIDE)
+		if (*fsm.transitioningWith == Pipe(NORTH_TO_EAST_BEND) && tile == SOUTH_TO_WEST_BEND) ||
+			(*fsm.transitioningWith == Pipe(SOUTH_TO_EAST_BEND) && tile == NORTH_TO_WEST_BEND) {
+			fsm.transitTo(OUTSIDE, new(Pipe))
 			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
 			return
 		}
-		if (*fsm.exitingWith == Pipe(NORTH_TO_EAST_BEND) && tile == NORTH_TO_WEST_BEND) ||
-			(*fsm.exitingWith == Pipe(SOUTH_TO_EAST_BEND) && tile == SOUTH_TO_WEST_BEND) {
-			fsm.exitingWith = new(Pipe)
-			fsm.transitTo(INSIDE)
+		if (*fsm.transitioningWith == Pipe(NORTH_TO_EAST_BEND) && tile == NORTH_TO_WEST_BEND) ||
+			(*fsm.transitioningWith == Pipe(SOUTH_TO_EAST_BEND) && tile == SOUTH_TO_WEST_BEND) {
+			fsm.transitTo(INSIDE, new(Pipe))
 			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
 			return
 		}
 	}
-}
-
-func (fsm *FSM) Solve() int {
-	for i := range fsm.terrain {
-		for j := range fsm.terrain[i] {
-			fsm.Process(Position{i, j})
-		}
-	}
-	return fsm.Count
 }
 
 func (fsm *FSM) String() string {
-	return fmt.Sprintf("fsm: {\n\tcurrent: %v \n\tcount: %v \n\tenteringWith: %v \n\texitingWith: %v\n}\n", string(fsm.currentState), fsm.Count, string(*fsm.enteringWith), string(*fsm.exitingWith))
+	return fmt.Sprintf(
+		"fsm: {\n\tcurrent: %v \n\tcount: %v \n\ttransitioningWith: %v\n}\n",
+		string(fsm.currentState),
+		fsm.Count,
+		string(*fsm.transitioningWith),
+	)
 }

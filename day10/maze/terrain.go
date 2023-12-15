@@ -2,7 +2,6 @@ package maze
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"amheklerior.com/advent-of-code-2023/utils"
@@ -23,6 +22,14 @@ func BuildTerrain(input string) Terrain {
 	return terrain
 }
 
+func (t *Terrain) CleanupFromJunkPipes(loop LoopPath) {
+	t.ForEach(func(tile Tile, i int, j int) {
+		if !tile.IsPipe() || !loop.Contains(Position{i, j}) {
+			(*t)[i][j] = GROUND
+		}
+	})
+}
+
 func (t *Terrain) At(p Position) Tile {
 	return (*t)[p.i][p.j]
 }
@@ -38,82 +45,22 @@ func (t *Terrain) Width() int {
 	return len((*t)[0])
 }
 
-func (t *Terrain) PositionOfTile(tile Tile) *Position {
-	for i, row := range [][]Tile(*t) {
-		for j, item := range row {
-			if item == tile {
-				return &Position{i, j}
-			}
-		}
-	}
-	return nil
-}
-
-func (terrain *Terrain) FollowPipe(currentPipePosition, comingFrom Position) (Position, Direction) {
-	if !terrain.At(currentPipePosition).IsPipe() {
-		log.Fatalf("Found %v at position %v, which is not a pipe.", terrain.At(currentPipePosition), currentPipePosition)
-	}
-
-	onTopRow := currentPipePosition.i == 0
-	onBottomRow := currentPipePosition.i == terrain.Height()-1
-	onFirstCol := currentPipePosition.j == 0
-	onLastCol := currentPipePosition.j == terrain.Width()-1
-
-	var nextPipePos Position
-	var onDir Direction
-	currentPipe := Pipe(terrain.At(currentPipePosition))
-	for _, dir := range currentPipe.ConnectionPoints() {
-		if (dir == NORTH && onTopRow) ||
-			(dir == SOUTH && onBottomRow) ||
-			(dir == EAST && onLastCol) ||
-			(dir == WEST && onFirstCol) {
-			continue
-		}
-
-		positionToCheck := Position{
-			currentPipePosition.i + vector[dir].i,
-			currentPipePosition.j + vector[dir].j,
-		}
-		tile := terrain.At(positionToCheck)
-
-		if comingFrom == positionToCheck || !tile.IsPipe() {
-			continue
-		}
-
-		if currentPipe.CanConnectWith(Pipe(tile), dir) {
-			nextPipePos = positionToCheck
-			onDir = dir
-		}
-	}
-	return nextPipePos, onDir
-}
-
-func (t *Terrain) BuildPipeLoop() PipeLoop {
-	var loop PipeLoop
-	entrypoint := t.PositionOfTile(ENTRY)
-	currPos, prevPos := *entrypoint, *entrypoint
-	loop.Add(Pipe(ENTRY), currPos)
-
-	for t.At(currPos) != ENTRY || len(loop) <= 1 {
-		nextPos, _ := t.FollowPipe(currPos, prevPos)
-		pipe := Pipe(t.At(nextPos))
-		loop.Add(pipe, nextPos)
-		prevPos, currPos = currPos, nextPos
-	}
-
-	return loop
-}
-
-func (t *Terrain) Cleanup(loop PipeLoop) {
+func (t *Terrain) ForEach(callback func(Tile, int, int)) {
 	for i := range *t {
 		for j := range (*t)[i] {
-			pos := Position{i, j}
-			tile := t.At(pos)
-			if !tile.IsPipe() || !loop.Contains(LoopPortion{Pipe(tile), pos}) {
-				(*t)[i][j] = GROUND
-			}
+			callback((*t)[i][j], i, j)
 		}
 	}
+}
+
+func (t *Terrain) Equal(other Terrain) bool {
+	isEqual := true
+	t.ForEach(func(tile Tile, i, j int) {
+		if tile != other[i][j] {
+			isEqual = false
+		}
+	})
+	return isEqual
 }
 
 func (t *Terrain) String() string {

@@ -1,7 +1,6 @@
 package maze
 
 import (
-	"log"
 	"slices"
 )
 
@@ -26,13 +25,5 @@ func (pipe Pipe) HasConnectorAlong(dir Direction) bool {
 }
 
 func (pipe Pipe) CanConnectWith(otherPipe Pipe, dir Direction) bool {
-	if !pipe.HasConnectorAlong(dir) {
-		log.Fatalf("Pipe %v cannot connect along %v. %v is not one of its connection points.", pipe, dir, dir)
-	}
-	for _, otherPipeConnector := range otherPipe.ConnectionPoints() {
-		if dir.connectsTo(otherPipeConnector) {
-			return true
-		}
-	}
-	return false
+	return pipe.HasConnectorAlong(dir) && slices.Contains(otherPipe.ConnectionPoints(), adjacentOf[dir])
 }

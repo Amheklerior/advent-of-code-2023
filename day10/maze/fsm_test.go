@@ -22,7 +22,7 @@ func TestFSMSolver(t *testing.T) {
 		t.Run(tt.testName, func(t *testing.T) {
 			input := utils.ReadFile(tt.filePath)
 			terrain := BuildTerrain(input)
-			loop := terrain.BuildPipeLoop()
+			loop := BuildPipeLoop(&terrain)
 			fsm := NewFSM(terrain, loop)
 			answer := fsm.Solve()
 			if answer != tt.expected {
