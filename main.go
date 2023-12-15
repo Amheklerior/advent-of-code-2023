@@ -32,7 +32,8 @@ func main() {
 	// day8.TestP2()
 	// day9.TestP1()
 	// day9.TestP2()
-	day10.TestP1()
+	// day10.TestP1()
+	// day10.TestP2()
 
 	println()
 
@@ -81,9 +82,11 @@ func main() {
 	fmt.Println()
 	fmt.Printf("Day 9 / Part 2 --> %v", day9.SolutionPart2(input(9)))
 	fmt.Println()
-	*/
 
 	fmt.Printf("Day 10 / Part 1 --> %v", day10.SolutionPart1(input(10)))
+	fmt.Println()
+	*/
+	fmt.Printf("Day 10 / Part 2 --> %v", day10.SolutionPart2(input(10)))
 	fmt.Println()
 
 }

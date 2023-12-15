@@ -1,7 +1,9 @@
 package maze
 
 import (
+	"fmt"
 	"log"
+	"strings"
 
 	"amheklerior.com/advent-of-code-2023/utils"
 )
@@ -47,7 +49,7 @@ func (t *Terrain) PositionOfTile(tile Tile) *Position {
 	return nil
 }
 
-func (terrain *Terrain) FollowPipe(currentPipePosition, comingFrom Position) Position {
+func (terrain *Terrain) FollowPipe(currentPipePosition, comingFrom Position) (Position, Direction) {
 	if !terrain.At(currentPipePosition).IsPipe() {
 		log.Fatalf("Found %v at position %v, which is not a pipe.", terrain.At(currentPipePosition), currentPipePosition)
 	}
@@ -57,7 +59,8 @@ func (terrain *Terrain) FollowPipe(currentPipePosition, comingFrom Position) Pos
 	onFirstCol := currentPipePosition.j == 0
 	onLastCol := currentPipePosition.j == terrain.Width()-1
 
-	var nextPipe Position
+	var nextPipePos Position
+	var onDir Direction
 	currentPipe := Pipe(terrain.At(currentPipePosition))
 	for _, dir := range currentPipe.ConnectionPoints() {
 		if (dir == NORTH && onTopRow) ||
@@ -78,10 +81,11 @@ func (terrain *Terrain) FollowPipe(currentPipePosition, comingFrom Position) Pos
 		}
 
 		if currentPipe.CanConnectWith(Pipe(tile), dir) {
-			nextPipe = positionToCheck
+			nextPipePos = positionToCheck
+			onDir = dir
 		}
 	}
-	return nextPipe
+	return nextPipePos, onDir
 }
 
 func (t *Terrain) BuildPipeLoop() PipeLoop {
@@ -91,11 +95,41 @@ func (t *Terrain) BuildPipeLoop() PipeLoop {
 	loop.Add(Pipe(ENTRY), currPos)
 
 	for t.At(currPos) != ENTRY || len(loop) <= 1 {
-		nextPos := t.FollowPipe(currPos, prevPos)
+		nextPos, _ := t.FollowPipe(currPos, prevPos)
 		pipe := Pipe(t.At(nextPos))
 		loop.Add(pipe, nextPos)
 		prevPos, currPos = currPos, nextPos
 	}
 
 	return loop
+}
+
+func (t *Terrain) Cleanup(loop PipeLoop) {
+	for i := range *t {
+		for j := range (*t)[i] {
+			pos := Position{i, j}
+			tile := t.At(pos)
+			if !tile.IsPipe() || !loop.Contains(LoopPortion{Pipe(tile), pos}) {
+				(*t)[i][j] = GROUND
+			}
+		}
+	}
+}
+
+func (t *Terrain) String() string {
+	var builder []string
+	builder = append(builder, fmt.Sprintf("T (%vx%v): [\n", (*t).Height(), (*t).Width()))
+	for _, row := range *t {
+		builder = append(builder, "\t[")
+		for j, item := range row {
+			builder = append(builder, string(item))
+			if j != (*t).Width()-1 {
+				builder = append(builder, " ")
+			}
+		}
+		builder = append(builder, "]\n")
+	}
+	builder = append(builder, "]")
+
+	return strings.Join(builder, "")
 }

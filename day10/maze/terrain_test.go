@@ -59,25 +59,26 @@ func TestAdjacentPipeFinding(t *testing.T) {
 	}
 
 	testCases := []struct {
-		testName   string
-		in         Position
-		comingFrom Position
-		expected   Position
+		testName    string
+		in          Position
+		comingFrom  Position
+		expectedPos Position
+		expectedDir Direction
 	}{
-		{"Properly follows the pipe #1 (inside)", Position{2, 3}, Position{2, 4}, Position{1, 3}},
-		{"Properly follows the pipe #2 (inside)", Position{3, 2}, Position{3, 1}, Position{3, 3}},
-		{"Properly follows the pipe #3 (inside)", Position{1, 1}, Position{1, 2}, Position{2, 1}},
-		{"Properly follows the pipe #4 (on left boundary)", Position{4, 0}, Position{3, 0}, Position{4, 1}},
-		{"Properly follows the pipe #5 (on right boundary)", Position{2, 4}, Position{2, 3}, Position{3, 4}},
-		{"Properly follows the pipe #6 (on top boundary)", Position{0, 2}, Position{1, 2}, Position{0, 3}},
-		{"Properly follows the pipe #6 (on bottom boundary)", Position{4, 0}, Position{4, 1}, Position{3, 0}},
+		{"Properly follows the pipe #1 (inside)", Position{2, 3}, Position{2, 4}, Position{1, 3}, NORTH},
+		{"Properly follows the pipe #2 (inside)", Position{3, 2}, Position{3, 1}, Position{3, 3}, EAST},
+		{"Properly follows the pipe #3 (inside)", Position{2, 1}, Position{1, 1}, Position{2, 0}, WEST},
+		{"Properly follows the pipe #4 (on left boundary)", Position{4, 0}, Position{3, 0}, Position{4, 1}, EAST},
+		{"Properly follows the pipe #5 (on right boundary)", Position{2, 4}, Position{2, 3}, Position{3, 4}, SOUTH},
+		{"Properly follows the pipe #6 (on top boundary)", Position{0, 2}, Position{1, 2}, Position{0, 3}, EAST},
+		{"Properly follows the pipe #6 (on bottom boundary)", Position{4, 0}, Position{4, 1}, Position{3, 0}, NORTH},
 	}
 
 	for _, tt := range testCases {
 		t.Run(tt.testName, func(t *testing.T) {
-			answer := terrain.FollowPipe(tt.in, tt.comingFrom)
-			if answer != tt.expected {
-				t.Errorf("Got %v, expected %v", answer, tt.expected)
+			pos, dir := terrain.FollowPipe(tt.in, tt.comingFrom)
+			if pos != tt.expectedPos || dir != tt.expectedDir {
+				t.Errorf("Got %v/%v, expected %v/%v", pos, dir, tt.expectedPos, tt.expectedDir)
 			}
 		})
 	}
@@ -91,7 +92,7 @@ func TestPathFindingFromEntrypoint(t *testing.T) {
 	}
 	expected := Position{2, 1}
 
-	answer := terrain.FollowPipe(Position{1, 1}, Position{1, 1})
+	answer, _ := terrain.FollowPipe(Position{1, 1}, Position{1, 1})
 	if answer != expected {
 		t.Errorf("Got %v, expected %v", answer, expected)
 	}
@@ -230,5 +231,30 @@ func TestBuildPipePath(t *testing.T) {
 				t.Errorf("Got %v, expected %v", answer, tt.expected)
 			}
 		})
+	}
+}
+
+func TestCleanup(t *testing.T) {
+	terrain := Terrain{
+		{VERTICAL_PIPE, HORIZONTAL_PIPE, SOUTH_TO_EAST_BEND, SOUTH_TO_WEST_BEND, SOUTH_TO_EAST_BEND},
+		{GROUND, SOUTH_TO_EAST_BEND, NORTH_TO_WEST_BEND, VERTICAL_PIPE, VERTICAL_PIPE},
+		{ENTRY, NORTH_TO_WEST_BEND, HORIZONTAL_PIPE, NORTH_TO_EAST_BEND, SOUTH_TO_WEST_BEND},
+		{VERTICAL_PIPE, SOUTH_TO_EAST_BEND, HORIZONTAL_PIPE, HORIZONTAL_PIPE, NORTH_TO_WEST_BEND},
+		{NORTH_TO_EAST_BEND, NORTH_TO_WEST_BEND, GROUND, NORTH_TO_EAST_BEND, NORTH_TO_WEST_BEND},
+	}
+	expected := Terrain{
+		{GROUND, GROUND, SOUTH_TO_EAST_BEND, SOUTH_TO_WEST_BEND, GROUND},
+		{GROUND, SOUTH_TO_EAST_BEND, NORTH_TO_WEST_BEND, VERTICAL_PIPE, GROUND},
+		{ENTRY, NORTH_TO_WEST_BEND, GROUND, NORTH_TO_EAST_BEND, SOUTH_TO_WEST_BEND},
+		{VERTICAL_PIPE, SOUTH_TO_EAST_BEND, HORIZONTAL_PIPE, HORIZONTAL_PIPE, NORTH_TO_WEST_BEND},
+		{NORTH_TO_EAST_BEND, NORTH_TO_WEST_BEND, GROUND, GROUND, GROUND},
+	}
+	loop := terrain.BuildPipeLoop()
+
+	terrain.Cleanup(loop)
+	for i := range terrain {
+		if !slices.Equal(terrain[i], expected[i]) {
+			t.Errorf("Got %v, expected %v (at row %v)", terrain[i], expected[i], i)
+		}
 	}
 }
