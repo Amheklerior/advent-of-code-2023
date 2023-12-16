@@ -65,9 +65,9 @@ func (t *Terrain) Equal(other Terrain) bool {
 
 func (t *Terrain) String() string {
 	var builder []string
-	builder = append(builder, fmt.Sprintf("T (%vx%v): [\n", (*t).Height(), (*t).Width()))
-	for _, row := range *t {
-		builder = append(builder, "\t[")
+	builder = append(builder, fmt.Sprintf("T (%vx%v): \n", (*t).Height(), (*t).Width()))
+	for i, row := range *t {
+		builder = append(builder, fmt.Sprintf("%v\t[", i))
 		for j, item := range row {
 			builder = append(builder, string(item))
 			if j != (*t).Width()-1 {
@@ -76,7 +76,6 @@ func (t *Terrain) String() string {
 		}
 		builder = append(builder, "]\n")
 	}
-	builder = append(builder, "]")
 
 	return strings.Join(builder, "")
 }

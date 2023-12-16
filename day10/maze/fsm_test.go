@@ -23,7 +23,8 @@ func TestFSMSolver(t *testing.T) {
 			input := utils.ReadFile(tt.filePath)
 			terrain := BuildTerrain(input)
 			loop := BuildPipeLoop(&terrain)
-			fsm := NewFSM(terrain, loop)
+			terrain.CleanupFromJunkPipes(loop)
+			fsm := NewFSM(terrain)
 			answer := fsm.Solve()
 			if answer != tt.expected {
 				t.Errorf("Got %v, expected %v (for terrain in '%v')", answer, tt.expected, tt.filePath)

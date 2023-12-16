@@ -17,18 +17,17 @@ type FSM struct {
 	currentState      State
 	Count             int
 	terrain           Terrain
-	loop              LoopPath
 	transitioningWith *Pipe
 }
 
-func NewFSM(terrain Terrain, loop LoopPath) FSM {
-	return FSM{
+func NewFSM(terrain Terrain) FSM {
+	var fsm = FSM{
 		currentState:      OUTSIDE,
 		Count:             0,
 		terrain:           terrain,
-		loop:              loop,
 		transitioningWith: new(Pipe),
 	}
+	return fsm
 }
 
 func (fsm *FSM) transitTo(state State, pipe *Pipe) {
@@ -48,75 +47,79 @@ func (fsm *FSM) Solve() int {
 func (fsm *FSM) Process(pos Position) {
 	tile := fsm.terrain.At(pos)
 
-	// fmt.Printf("%vprocessing tile %v in position (%v,%v)\n", fsm, string(tile), position.i, position.j)
 	switch fsm.currentState {
 	case OUTSIDE:
-		// fmt.Printf("Processing OUTSIDE state...\n")
-		if !fsm.loop.Contains(pos) {
-			// fmt.Printf("%v is not part of the loop\n", string(tile))
+		if tile == GROUND {
+			// Ignore all ground and junk pipes
 			return
 		}
 		if tile == ENTRY {
 			tile = Tile(IdentyfyEntryPipeType(&fsm.terrain, pos))
 		}
 		if tile == VERTICAL_PIPE {
+			// vertical pipes always count as crossing
 			fsm.transitTo(INSIDE, nil)
-			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
 			return
 		}
 		if tile == SOUTH_TO_EAST_BEND || tile == NORTH_TO_EAST_BEND {
+			// Crossing that must be confirmed by a later piece
 			pipe := Pipe(tile)
 			fsm.transitTo(ENTERING, &pipe)
-			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
 			return
 		}
+		// walking from left to right, we can never encounter
+		// NORTH_TO_WEST or SOUTH_TO_WEST pipes coming from outside
 	case INSIDE:
 		// fmt.Printf("Processing INSIDE state...\n")
-		if tile == GROUND || !fsm.loop.Contains(pos) {
+		if tile == GROUND {
+			// Count all ground and junk pipes
 			fsm.Count++
-			// fmt.Printf("Updated count to %v in position (%v,%v)\n", fsm.Count, position.i, position.j)
 			return
 		}
 		if tile == ENTRY {
 			tile = Tile(IdentyfyEntryPipeType(&fsm.terrain, pos))
 		}
 		if tile == VERTICAL_PIPE {
+			// vertical pipes always count as crossing
 			fsm.transitTo(OUTSIDE, nil)
-			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
 			return
 		}
 		if tile == SOUTH_TO_EAST_BEND || tile == NORTH_TO_EAST_BEND {
+			// crossing that must be confirmed by a later piece
 			pipe := Pipe(tile)
 			fsm.transitTo(EXITING, &pipe)
-			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
 			return
 		}
 	case ENTERING:
-		// fmt.Printf("Processing ENTERING state...\n")
+		if tile == ENTRY {
+			tile = Tile(IdentyfyEntryPipeType(&fsm.terrain, pos))
+		}
 		if (*fsm.transitioningWith == Pipe(NORTH_TO_EAST_BEND) && tile == SOUTH_TO_WEST_BEND) ||
 			(*fsm.transitioningWith == Pipe(SOUTH_TO_EAST_BEND) && tile == NORTH_TO_WEST_BEND) {
 			fsm.transitTo(INSIDE, new(Pipe))
-			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
+			// crossing confirmed
 			return
 		}
 		if (*fsm.transitioningWith == Pipe(NORTH_TO_EAST_BEND) && tile == NORTH_TO_WEST_BEND) ||
 			(*fsm.transitioningWith == Pipe(SOUTH_TO_EAST_BEND) && tile == SOUTH_TO_WEST_BEND) {
 			fsm.transitTo(OUTSIDE, new(Pipe))
-			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
+			// crossing discarded
 			return
 		}
 	case EXITING:
-		// fmt.Printf("Processing EXITING state...\n\n")
+		if tile == ENTRY {
+			tile = Tile(IdentyfyEntryPipeType(&fsm.terrain, pos))
+		}
 		if (*fsm.transitioningWith == Pipe(NORTH_TO_EAST_BEND) && tile == SOUTH_TO_WEST_BEND) ||
 			(*fsm.transitioningWith == Pipe(SOUTH_TO_EAST_BEND) && tile == NORTH_TO_WEST_BEND) {
 			fsm.transitTo(OUTSIDE, new(Pipe))
-			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
+			// crossing confirmed
 			return
 		}
 		if (*fsm.transitioningWith == Pipe(NORTH_TO_EAST_BEND) && tile == NORTH_TO_WEST_BEND) ||
 			(*fsm.transitioningWith == Pipe(SOUTH_TO_EAST_BEND) && tile == SOUTH_TO_WEST_BEND) {
 			fsm.transitTo(INSIDE, new(Pipe))
-			// fmt.Printf("Change fsm state to %v \n", fsm.currentState)
+			// crossing discarded
 			return
 		}
 	}
