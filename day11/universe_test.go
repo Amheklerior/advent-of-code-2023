@@ -64,3 +64,32 @@ func TestDistance(t *testing.T) {
 	}
 
 }
+
+func TestSolve(t *testing.T) {
+	univ := NewUniverse(utils.ReadFile("./data/p1-input.test.txt"))
+	univ.GetGalaxies()
+
+	testCases := []struct {
+		name            string
+		expansionFactor int
+		expected        int
+	}{
+		{"Expansion factor: 1", 1, 374},
+		{"Expansion factor: 10", 10, 1030},
+		{"Expansion factor: 100", 100, 8410},
+	}
+
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			solution := univ.Solve(tt.expansionFactor)
+			if solution != tt.expected {
+				t.Errorf(
+					"Got %v, expected %v. For expansion factor %v",
+					solution,
+					tt.expected,
+					tt.expansionFactor,
+				)
+			}
+		})
+	}
+}

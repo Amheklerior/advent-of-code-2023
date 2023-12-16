@@ -80,6 +80,9 @@ func getEmptyAreas(space Space) ([]int, []int) {
 func (univ *Universe) DistanceBetween(from, to Coordinate, expansionFactor int) int {
 	verticalDistance := int(math.Abs(float64(to.y - from.y)))
 	horizontalDistance := int(math.Abs(float64(to.x - from.x)))
+	if expansionFactor > 1 {
+		expansionFactor--
+	}
 
 	for _, idx := range univ.emptyCols {
 		if (idx < from.x && idx > to.x) || (idx > from.x && idx < to.x) {
@@ -94,4 +97,15 @@ func (univ *Universe) DistanceBetween(from, to Coordinate, expansionFactor int) 
 	}
 
 	return verticalDistance + horizontalDistance
+}
+
+func (u *Universe) Solve(expFactor int) int {
+	galaxies := u.GetGalaxies()
+	sum := 0
+	for i := range galaxies {
+		for j := i + 1; j < len(galaxies); j++ {
+			sum += u.DistanceBetween(galaxies[i], galaxies[j], expFactor)
+		}
+	}
+	return sum
 }
